@@ -1,45 +1,10 @@
-[![Continuous Integration](https://github.com/kaiosilveira/refactoring-catalog-template/actions/workflows/ci.yml/badge.svg)](https://github.com/kaiosilveira/refactoring-catalog-template/actions/workflows/ci.yml)
-
-# Refactoring catalog repository template
-
-This is a quick template to help me get a new refactoring repo going.
-
-## Things to do after creating a repo off of this template
-
-1. Run `yarn tools:cli prepare-repository -r <repo_name>`. It will:
-
-- Update the `README.md` file with the actual repository name, CI badge, and commit history link
-- Update `package.json` with the repository's name and remote URL
-- Update the repo's homepage on GitHub with:
-  - A description
-  - A website link to https://github.com/kaiosilveira/refactoring
-  - The following labels: javascript, refactoring, [REPOSITORY_NAME]
-
-2. Replace the lorem ipsum text sections below with actual text
-
-## Useful commands
-
-- Generate markdown containing a diff with patch information based on a range of commits:
-
-```bash
-yarn tools:cli generate-diff -f <first_commit_sha> -l <last_commit_sha>
-```
-
-- To generate the commit history table for the last section, including the correct links:
-
-```bash
-yarn tools:cli generate-cmt-table -r [REPOSITORY_NAME]
-```
-
----
+[![Continuous Integration](https://github.com/kaiosilveira/change-reference-to-value-refactoring/actions/workflows/ci.yml/badge.svg)](https://github.com/kaiosilveira/change-reference-to-value-refactoring/actions/workflows/ci.yml)
 
 ℹ️ _This repository is part of my Refactoring catalog based on Fowler's book with the same title. Please see [kaiosilveira/refactoring](https://github.com/kaiosilveira/refactoring) for more details._
 
 ---
 
-# Refactoring name
-
-**Formerly: Old name**
+# Change Reference To Value
 
 <table>
 <thead>
@@ -51,7 +16,11 @@ yarn tools:cli generate-cmt-table -r [REPOSITORY_NAME]
 <td>
 
 ```javascript
-result = initial.code;
+class Proudct {
+  applyDiscount(arg) {
+    this._price.amount -= arg;
+  }
+}
 ```
 
 </td>
@@ -59,10 +28,10 @@ result = initial.code;
 <td>
 
 ```javascript
-result = newCode();
-
-function newCode() {
-  return 'new code';
+class Proudct {
+  applyDiscount(arg) {
+    this._price = new Money(this._price.amount - arg, this._price.currency);
+  }
 }
 ```
 
@@ -71,58 +40,272 @@ function newCode() {
 </tbody>
 </table>
 
-**Inverse of: [Another refactoring](https://github.com/kaiosilveira/refactoring)**
+**Inverse of: [Change Value to Reference](https://github.com/kaiosilveira/change-value-to-reference-refactoring)**
 
-**Refactoring introduction and motivation** dolore sunt deserunt proident enim excepteur et cillum duis velit dolor. Aute proident laborum officia velit culpa enim occaecat officia sunt aute labore id anim minim. Eu minim esse eiusmod enim nulla Lorem. Enim velit in minim anim anim ad duis aute ipsum voluptate do nulla. Ad tempor sint dolore et ullamco aute nulla irure sunt commodo nulla aliquip.
+Mutability is one of the most important aspects to be aware of in any software program. Ripple effects can cause hard-to-debug problems and flaky tests but, sometimes, they're exactly what we're expecting to happen. This refactoring helps in cases where we want our underlying objects (or data structures) to be immutable, therefore avoiding rippling side effects and leveraging the **[Value Object](https://github.com/kaiosilveira/poeaa-value-object)** pattern.
 
 ## Working example
 
-**Working example general explanation** proident reprehenderit mollit non voluptate ea aliquip ad ipsum anim veniam non nostrud. Cupidatat labore occaecat labore veniam incididunt pariatur elit officia. Aute nisi in nulla non dolor ullamco ut dolore do irure sit nulla incididunt enim. Cupidatat aliquip minim culpa enim. Fugiat occaecat qui nostrud nostrud eu exercitation Lorem pariatur fugiat ea consectetur pariatur irure. Officia dolore veniam duis duis eu eiusmod cupidatat laboris duis ad proident adipisicing. Minim veniam consectetur ut deserunt fugiat id incididunt reprehenderit.
+Our working example, extracted from the book, is a program that contains a `Person` and a `TelehoneNumber` class. Each `Person` holds a reference to `TelephoneNumber` and also has getters and setters that update the underlying object. In this case, we want to **[remove the setting methods](https://github.com/kaiosilveira/remove-setting-method-refactoring)** from `TelephoneNumber` and recreate an instance of it every time a setter is called on `Person`.
+
+The class representing a person looks like this:
+
+```javascript
+import { TelephoneNumber } from '../telephone-number';
+
+export class Person {
+  constructor() {
+    this._telephoneNumber = new TelephoneNumber();
+  }
+
+  get officeAreaCode() {
+    return this._telephoneNumber.areaCode;
+  }
+
+  set officeAreaCode(arg) {
+    this._telephoneNumber.areaCode = arg;
+  }
+
+  get officeNumber() {
+    return this._telephoneNumber.number;
+  }
+
+  set officeNumber(arg) {
+    this._telephoneNumber.number = arg;
+  }
+}
+```
+
+And the class for telephone number like this:
+
+```javascript
+export class TelephoneNumber {
+  get areaCode() {
+    return this._areaCode;
+  }
+
+  set areaCode(arg) {
+    this._areaCode = arg;
+  }
+
+  get number() {
+    return this._number;
+  }
+
+  set number(arg) {
+    this._number = arg;
+  }
+}
+```
 
 ### Test suite
 
-Occaecat et incididunt aliquip ex id dolore. Et excepteur et ea aute culpa fugiat consectetur veniam aliqua. Adipisicing amet reprehenderit elit qui.
+Our test suites are straightforward: For both classes, we're making sure we can use the setters and then retrieve data using the getters. They look like this:
 
 ```javascript
-describe('functionBeingRefactored', () => {
-  it('should work', () => {
-    expect(0).toEqual(1);
+import { Person } from './index';
+
+describe('Person', () => {
+  it('should set and get officeAreaCode', () => {
+    const person = new Person();
+    person.officeAreaCode = '123';
+    expect(person.officeAreaCode).toBe('123');
+  });
+
+  it('should set and get officeNumber', () => {
+    const person = new Person();
+    person.officeNumber = '456';
+    expect(person.officeNumber).toBe('456');
+  });
+});
+
+import { TelephoneNumber } from './index';
+
+describe('TelephoneNumber', () => {
+  it('should set and get areaCode', () => {
+    const telephoneNumber = new TelephoneNumber();
+    telephoneNumber.areaCode = '123';
+    expect(telephoneNumber.areaCode).toBe('123');
+  });
+
+  it('should set and get number', () => {
+    const telephoneNumber = new TelephoneNumber();
+    telephoneNumber.number = '456';
+    expect(telephoneNumber.number).toBe('456');
   });
 });
 ```
 
-Magna ut tempor et ut elit culpa id minim Lorem aliqua laboris aliqua dolor. Irure mollit ad in et enim consequat cillum voluptate et amet esse. Fugiat incididunt ea nulla cupidatat magna enim adipisicing consequat aliquip commodo elit et. Mollit aute irure consequat sunt. Dolor consequat elit voluptate aute duis qui eu do veniam laborum elit quis.
+These are the minimum tests we need to safely proceed with the refactoring.
 
 ### Steps
 
-**Step 1 description** mollit eu nulla mollit irure sint proident sint ipsum deserunt ad consectetur laborum incididunt aliqua. Officia occaecat deserunt in aute veniam sunt ad fugiat culpa sunt velit nulla. Pariatur anim sit minim sit duis mollit.
+Our main goal is to get rid of the setters on `TelephoneNumber`, but we still need to set it up somehow, so we introduce a constructor method (and in an extra cautious move, we add unit tests for it as well):
 
 ```diff
-diff --git a/src/price-order/index.js b/src/price-order/index.js
-@@ -3,6 +3,11 @@
--module.exports = old;
-+module.exports = new;
++++ b/src/telephone-number/index.js
+@@ -1,4 +1,9 @@
+ export class TelephoneNumber {
++  constructor(areaCode, number) {
++    this._areaCode = areaCode;
++    this._number = number;
++  }
++
+   get areaCode() {
+     return this._areaCode;
+   }
+
+diff --git a/src/telephone-number/index.test.js b/src/telephone-number/index.test.js
+@@ -1,6 +1,13 @@
+ import { TelephoneNumber } from './index';
+ describe('TelephoneNumber', () => {
++  it('should create a new instance', () => {
++    const telephoneNumber = new TelephoneNumber('123', '456');
++    expect(telephoneNumber).toBeInstanceOf(TelephoneNumber);
++    expect(telephoneNumber.areaCode).toBe('123');
++    expect(telephoneNumber.number).toBe('456');
++  });
++
+   it('should set and get areaCode', () => {
+     const telephoneNumber = new TelephoneNumber();
+     telephoneNumber.areaCode = '123';
 ```
 
-**Step n description** mollit eu nulla mollit irure sint proident sint ipsum deserunt ad consectetur laborum incididunt aliqua. Officia occaecat deserunt in aute veniam sunt ad fugiat culpa sunt velit nulla. Pariatur anim sit minim sit duis mollit.
+Then we can start replacing the setting methods on `Person` with reassignments. We start with the `officeAreaCode`:
 
 ```diff
-diff --git a/src/price-order/index.js b/src/price-order/index.js
-@@ -3,6 +3,11 @@
--module.exports = old;
-+module.exports = new;
++++ b/src/person/index.js
+@@ -10,7 +10,7 @@ export class Person {
+   }
+   set officeAreaCode(arg) {
+-    this._telephoneNumber.areaCode = arg;
++    this._telephoneNumber = new TelephoneNumber(arg, this.officeNumber);
+   }
+   get officeNumber() {
 ```
 
-And that's it!
+Followed by the `officeNumber`:
+
+```diff
++++ b/src/person/index.js
+@@ -18,6 +18,6 @@ export class Person {
+   }
+   set officeNumber(arg) {
+-    this._telephoneNumber.number = arg;
++    this._telephoneNumber = new TelephoneNumber(this.officeAreaCode, arg);
+   }
+ }
+```
+
+Finally, to make `TelephoneNumber` a true Value Object, we introduce an `equals` method (which is somewhat tricky to do in Javascript, but you get the idea anyway) and its companion unit tests:
+
+```diff
++++ b/src/telephone-number/index.js
+@@ -19,4 +19,9 @@ export class TelephoneNumber {
+   set number(arg) {
+     this._number = arg;
+   }
++
++  equals(other) {
++    if (!other instanceof TelephoneNumber) return false;
++    return this.areaCode === other.areaCode && this.number === other.number;
++  }
+ }
+
+diff --git a/src/telephone-number/index.test.js b/src/telephone-number/index.test.js
+@@ -19,4 +19,18 @@ describe('TelephoneNumber', () => {
+     telephoneNumber.number = '456';
+     expect(telephoneNumber.number).toBe('456');
+   });
++
++  describe('equals', () => {
++    it('should return true if two telephone numbers are equal', () => {
++      const telephoneNumber1 = new TelephoneNumber('123', '456');
++      const telephoneNumber2 = new TelephoneNumber('123', '456');
++      expect(telephoneNumber1.equals(telephoneNumber2)).toBe(true);
++    });
++
++    it('should return false if two telephone numbers are not equal', () => {
++      const telephoneNumber1 = new TelephoneNumber('123', '456');
++      const telephoneNumber2 = new TelephoneNumber('123', '789');
++      expect(telephoneNumber1.equals(telephoneNumber2)).toBe(false);
++    });
++  });
+ });
+```
+
+Finally, we can start removing the setting methods. We start with `number`:
+
+```diff
++++ b/src/telephone-number/index.js
+@@ -16,10 +16,6 @@ export class TelephoneNumber {
+     return this._number;
+   }
+-  set number(arg) {
+-    this._number = arg;
+-  }
+-
+   equals(other) {
+     if (!other instanceof TelephoneNumber) return false;
+     return this.areaCode === other.areaCode && this.number === other.number;
+diff --git a/src/telephone-number/index.test.js b/src/telephone-number/index.test.js
+@@ -14,12 +14,6 @@ describe('TelephoneNumber', () => {
+     expect(telephoneNumber.areaCode).toBe('123');
+   });
+-  it('should set and get number', () => {
+-    const telephoneNumber = new TelephoneNumber();
+-    telephoneNumber.number = '456';
+-    expect(telephoneNumber.number).toBe('456');
+-  });
+-
+   describe('equals', () => {
+     it('should return true if two telephone numbers are equal', () => {
+       const telephoneNumber1 = new TelephoneNumber('123', '456');
+```
+
+And then move on to `areaCode`:
+
+```diff
++++ b/src/telephone-number/index.js
+@@ -8,10 +8,6 @@ export class TelephoneNumber {
+     return this._areaCode;
+   }
+-  set areaCode(arg) {
+-    this._areaCode = arg;
+-  }
+-
+   get number() {
+     return this._number;
+   }
+
+diff --git a/src/telephone-number/index.test.js b/src/telephone-number/index.test.js
+@@ -8,12 +8,6 @@ describe('TelephoneNumber', () => {
+     expect(telephoneNumber.number).toBe('456');
+   });
+-  it('should set and get areaCode', () => {
+-    const telephoneNumber = new TelephoneNumber();
+-    telephoneNumber.areaCode = '123';
+-    expect(telephoneNumber.areaCode).toBe('123');
+-  });
+-
+   describe('equals', () => {
+     it('should return true if two telephone numbers are equal', () => {
+       const telephoneNumber1 = new TelephoneNumber('123', '456');
+```
+
+And we're done!
 
 ### Commit history
 
 Below there's the commit history for the steps detailed above.
 
-| Commit SHA                                                                  | Message                  |
-| --------------------------------------------------------------------------- | ------------------------ |
-| [cmt-sha-1](https://github.com/kaiosilveira/[REPOSITORY_NAME]/commit-SHA-1) | description of commit #1 |
-| [cmt-sha-2](https://github.com/kaiosilveira/[REPOSITORY_NAME]/commit-SHA-2) | description of commit #2 |
-| [cmt-sha-n](https://github.com/kaiosilveira/[REPOSITORY_NAME]/commit-SHA-n) | description of commit #n |
+| Commit SHA                                                                                                                       | Message                                                               |
+| -------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [cd833ad](https://github.com/kaiosilveira/change-reference-to-value-refactoring/commit/cd833ad652a9a37fcceba22c892ac0f3cdbfafa9) | introduce constructor method for `TelephoneNumber`                    |
+| [1a5065e](https://github.com/kaiosilveira/change-reference-to-value-refactoring/commit/1a5065eb177c126c9cefb990544b5ccbfd8023f4) | replace setting method to reassignment at `set Person.officeAreaCode` |
+| [e077b06](https://github.com/kaiosilveira/change-reference-to-value-refactoring/commit/e077b06e5c18d058c8859137adc3ac079a7c0084) | replace setting method to reassignment at `set Person.officeNumber`   |
+| [ba7c14c](https://github.com/kaiosilveira/change-reference-to-value-refactoring/commit/ba7c14c2ff47151f38525a87eff99c279f446679) | introduce `equals` method for `TelephoneNumber`                       |
+| [bf05671](https://github.com/kaiosilveira/change-reference-to-value-refactoring/commit/bf056716ab2ac221dbab714e80c66f73e63bd76e) | remove `number` setter of `TelephoneNumber`                           |
+| [21e5206](https://github.com/kaiosilveira/change-reference-to-value-refactoring/commit/21e5206f3e5b250389e2306c6dda7561d12e876a) | remove `areaCode` setter for `TelephoneNumber`                        |
 
-For the full commit history for this project, check the [Commit History tab](https://github.com/kaiosilveira/[REPOSITORY_NAME]/commits/main).
+For the full commit history for this project, check the [Commit History tab](https://github.com/kaiosilveira/change-reference-to-value-refactoring/commits/main).
