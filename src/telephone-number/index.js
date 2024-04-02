@@ -16,10 +16,6 @@ export class TelephoneNumber {
     return this._number;
   }
 
-  set number(arg) {
-    this._number = arg;
-  }
-
   equals(other) {
     if (!other instanceof TelephoneNumber) return false;
     return this.areaCode === other.areaCode && this.number === other.number;
