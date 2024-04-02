@@ -1,4 +1,9 @@
 export class TelephoneNumber {
+  constructor(areaCode, number) {
+    this._areaCode = areaCode;
+    this._number = number;
+  }
+
   get areaCode() {
     return this._areaCode;
   }
