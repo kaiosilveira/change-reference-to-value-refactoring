@@ -1,9 +1,9 @@
 {
   "type": "module",
-  "name": "refactoring-catalog-template",
+  "name": "change-reference-to-value-refactoring",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "https://github.com/kaiosilveira/refactoring-catalog-template.git",
+  "repository": "https://github.com/kaiosilveira/change-reference-to-value-refactoring.git",
   "author": "Kaio Silveira <silveira.kaio@icloud.com>",
   "license": "MIT",
   "scripts": {
