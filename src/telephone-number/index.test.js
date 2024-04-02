@@ -8,12 +8,6 @@ describe('TelephoneNumber', () => {
     expect(telephoneNumber.number).toBe('456');
   });
 
-  it('should set and get areaCode', () => {
-    const telephoneNumber = new TelephoneNumber();
-    telephoneNumber.areaCode = '123';
-    expect(telephoneNumber.areaCode).toBe('123');
-  });
-
   describe('equals', () => {
     it('should return true if two telephone numbers are equal', () => {
       const telephoneNumber1 = new TelephoneNumber('123', '456');

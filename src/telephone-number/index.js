@@ -8,10 +8,6 @@ export class TelephoneNumber {
     return this._areaCode;
   }
 
-  set areaCode(arg) {
-    this._areaCode = arg;
-  }
-
   get number() {
     return this._number;
   }
