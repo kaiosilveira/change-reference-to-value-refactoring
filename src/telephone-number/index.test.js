@@ -19,4 +19,18 @@ describe('TelephoneNumber', () => {
     telephoneNumber.number = '456';
     expect(telephoneNumber.number).toBe('456');
   });
+
+  describe('equals', () => {
+    it('should return true if two telephone numbers are equal', () => {
+      const telephoneNumber1 = new TelephoneNumber('123', '456');
+      const telephoneNumber2 = new TelephoneNumber('123', '456');
+      expect(telephoneNumber1.equals(telephoneNumber2)).toBe(true);
+    });
+
+    it('should return false if two telephone numbers are not equal', () => {
+      const telephoneNumber1 = new TelephoneNumber('123', '456');
+      const telephoneNumber2 = new TelephoneNumber('123', '789');
+      expect(telephoneNumber1.equals(telephoneNumber2)).toBe(false);
+    });
+  });
 });
