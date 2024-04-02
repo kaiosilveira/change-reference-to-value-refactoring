@@ -18,6 +18,6 @@ export class Person {
   }
 
   set officeNumber(arg) {
-    this._telephoneNumber.number = arg;
+    this._telephoneNumber = new TelephoneNumber(this.officeAreaCode, arg);
   }
 }
